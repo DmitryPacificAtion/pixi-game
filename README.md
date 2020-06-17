@@ -1,4 +1,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+P.S. And ejected by me, to decrease time for setting-up this env.
+Yeah, I understand that there is a lot of unnesesary libraries, but we need just PIXI and Typescript.
 
 ## Available Scripts
 

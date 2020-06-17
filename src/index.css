@@ -9,11 +9,7 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-
-input[type='text'] {
-  border: 1px solid grey;
-  border-radius: 3px;
-  padding: 8px 12px;
-  width: calc(100% - 24px);
-  margin-bottom: 20px;
+#root {
+  margin: 50px auto;
+  text-align: center;
 }
