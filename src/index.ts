@@ -1,20 +1,33 @@
 import * as PIXI from 'pixi.js';
 import './index.css';
+import * as CAT from './assets/cat.png';
 
 const app = new PIXI.Application({
-  width: 640,
-  height: 480,
+  width: window.innerWidth,
+  height: window.innerHeight,
   backgroundColor: 0xe3e3e3,
-  // antialias: true,
+  antialias: true,
 });
 
+window.addEventListener('resize', () => app.renderer.resize(window.innerWidth, window.innerHeight))
+const root = document.getElementById('root');
+root.appendChild(app.view);
+
+const loader = new PIXI.Loader();
+loader.add(CAT).load(setup);
+
+function setup() {
+  const cat = new PIXI.Sprite(loader.resources[CAT].texture);
+  app.stage.addChild(cat);
+}
+
+/* 
 const shapes = [];
 let gravity = 1;
 const root = document.getElementById('root');
 root.appendChild(app.view);
 app.view.addEventListener('pointerdown', (e) => {
   generateRect(e.offsetX, e.offsetY);
-  console.log('[x, y]', e.offsetX, e.offsetY);
 });
 
 app.ticker.add(() => {
@@ -51,4 +64,4 @@ function generateRect(x = 50, y = -50) {
   rect.endFill();
   shapes.push(rect);
   app.stage.addChild(rect);
-}
+} */
