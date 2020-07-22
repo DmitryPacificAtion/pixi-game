@@ -1,12 +1,14 @@
 import * as PIXI from 'pixi.js';
 import './index.css';
 import * as CAT from './assets/cat.png';
+import * as KIDS_TILESET from './assets/09.png';
 
 let TextureCache = PIXI.utils.TextureCache,
-    Application = PIXI.Application,
-    loader = new PIXI.Loader(),
-    resources = loader.resources,
-    Sprite = PIXI.Sprite;
+  Application = PIXI.Application,
+  loader = new PIXI.Loader(),
+  resources = loader.resources,
+  Sprite = PIXI.Sprite,
+  Rectangle = PIXI.Rectangle;
 
 
 
@@ -16,20 +18,57 @@ const app = new Application({
   backgroundColor: 0xe3e3e3,
   antialias: true,
 });
+// app.renderer.view.style.overflow = 'hidden';
 
 window.addEventListener('resize', () => app.renderer.resize(window.innerWidth, window.innerHeight))
 const root = document.getElementById('root');
 root.appendChild(app.view);
 
-loader.add('cat', CAT).on("progress", (loader, resource) => {
-  console.log('loading:', resource.name, loader.progress + '%');
-}).load(setup);
 
-function setup() {
-  const cat = new Sprite(resources.cat.texture); // or resources.cat.texture
-  app.stage.addChild(cat);
+/* CAT */
+// loader.add('cat', CAT).on("progress", (loader, resource) => {
+//   console.log('loading:', resource.name, loader.progress + '%');
+// }).load(setupCats);
+
+// function setupCats() {
+//   const cat = new Sprite(resources.cat.texture); // or resources.cat.texture
+//   const kitty = new Sprite(resources.cat.texture); // or resources.cat.texture
+//   cat.position.set(150, 150);
+//   cat.scale.set(2);
+//   cat.anchor.x = 0.5;
+//   cat.anchor.y = 0.5;
+//   cat.rotation = 0;
+  
+//   kitty.position.set(350, 150);
+//   kitty.scale.set(1.75);
+//   kitty.pivot.set(32, 32)
+//   kitty.rotation = 0;
+//   setInterval(() => {
+//     cat.rotation += 0.2;
+//     kitty.rotation += 0.2;
+//   }, 100);
+//   app.stage.addChild(cat);
+//   app.stage.addChild(kitty);
+// }
+
+
+loader.add(KIDS_TILESET).load(setupTile);
+  
+function setupTile() {
+  let texture = TextureCache[KIDS_TILESET]; // Use resources.cat.texture
+  let rectangle = new Rectangle(96, 64, 32, 32);
+  texture.frame = rectangle;
+  let rocket = new Sprite(texture);
+  rocket.x = 64;
+  rocket.y = 64;
+  app.stage.addChild(rocket);
+  app.renderer.render(app.stage);
+  app.ticker.add((delta) => moveLoop(delta, rocket));
+  }
+
+function moveLoop(delta, item) {
+  item.x += delta;
 }
-
 /* 
 const shapes = [];
 let gravity = 1;
