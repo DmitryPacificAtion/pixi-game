@@ -2,7 +2,15 @@ import * as PIXI from 'pixi.js';
 import './index.css';
 import * as CAT from './assets/cat.png';
 
-const app = new PIXI.Application({
+let TextureCache = PIXI.utils.TextureCache,
+    Application = PIXI.Application,
+    loader = new PIXI.Loader(),
+    resources = loader.resources,
+    Sprite = PIXI.Sprite;
+
+
+
+const app = new Application({
   width: window.innerWidth,
   height: window.innerHeight,
   backgroundColor: 0xe3e3e3,
@@ -13,11 +21,10 @@ window.addEventListener('resize', () => app.renderer.resize(window.innerWidth, w
 const root = document.getElementById('root');
 root.appendChild(app.view);
 
-const loader = new PIXI.Loader();
 loader.add(CAT).load(setup);
 
 function setup() {
-  const cat = new PIXI.Sprite(loader.resources[CAT].texture);
+  const cat = new Sprite(resources[CAT].texture);
   app.stage.addChild(cat);
 }
 
