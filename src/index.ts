@@ -21,10 +21,12 @@ window.addEventListener('resize', () => app.renderer.resize(window.innerWidth, w
 const root = document.getElementById('root');
 root.appendChild(app.view);
 
-loader.add(CAT).load(setup);
+loader.add('cat', CAT).on("progress", (loader, resource) => {
+  console.log('loading:', resource.name, loader.progress + '%');
+}).load(setup);
 
 function setup() {
-  const cat = new Sprite(resources[CAT].texture);
+  const cat = new Sprite(resources.cat.texture); // or resources.cat.texture
   app.stage.addChild(cat);
 }
 
