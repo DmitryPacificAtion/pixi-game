@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import './index.css';
 import * as CAT from './assets/cat.png';
 import * as KIDS_TILESET from './assets/09.png';
+import * as KIRBY from './assets/kirby.png';
 
 let TextureCache = PIXI.utils.TextureCache,
   Application = PIXI.Application,
@@ -10,12 +11,10 @@ let TextureCache = PIXI.utils.TextureCache,
   Sprite = PIXI.Sprite,
   Rectangle = PIXI.Rectangle;
 
-
-
 const app = new Application({
   width: window.innerWidth,
-  height: window.innerHeight,
-  backgroundColor: 0xe3e3e3,
+  height: window.innerHeight - 20,
+  backgroundColor: 0x749ad4,
   antialias: true,
 });
 // app.renderer.view.style.overflow = 'hidden';
@@ -38,7 +37,7 @@ root.appendChild(app.view);
 //   cat.anchor.x = 0.5;
 //   cat.anchor.y = 0.5;
 //   cat.rotation = 0;
-  
+
 //   kitty.position.set(350, 150);
 //   kitty.scale.set(1.75);
 //   kitty.pivot.set(32, 32)
@@ -53,23 +52,138 @@ root.appendChild(app.view);
 
 
 loader.add(KIDS_TILESET).load(setupTile);
-  
+
+let rocket, state;
+
 function setupTile() {
-  let texture = TextureCache[KIDS_TILESET]; // Use resources.cat.texture
-  let rectangle = new Rectangle(96, 64, 32, 32);
+  const texture = TextureCache[KIDS_TILESET]; // Use resources.cat.texture
+  const rectangle = new Rectangle(96, 64, 32, 32);
   texture.frame = rectangle;
-  let rocket = new Sprite(texture);
+  rocket = new Sprite(texture);
   rocket.x = 64;
   rocket.y = 64;
+  rocket.vx = 0;
+  rocket.vy = 0;
   app.stage.addChild(rocket);
-  app.renderer.render(app.stage);
-  app.ticker.add((delta) => moveLoop(delta, rocket));
-  }
 
-function moveLoop(delta, item) {
-  item.x += delta;
+  //Capture the keyboard arrow keys
+  let left = keyboard("ArrowLeft"),
+      up = keyboard("ArrowUp"),
+      right = keyboard("ArrowRight"),
+      down = keyboard("ArrowDown");
+  
+  //Left arrow key `press` method
+  left.press = () => {
+    //Change the cat's velocity when the key is pressed
+    rocket.vx = -5;
+    rocket.vy = 0;
+  };
+  
+  //Left arrow key `release` method
+  left.release = () => {
+    //If the left arrow has been released, and the right arrow isn't down,
+    //and the cat isn't moving vertically:
+    //Stop the cat
+    if (!right.isDown && rocket.vy === 0) {
+      rocket.vx = 0;
+    }
+  };
+
+  //Up
+  up.press = () => {
+    rocket.vy = -5;
+    rocket.vx = 0;
+  };
+  up.release = () => {
+    if (!down.isDown && rocket.vx === 0) {
+      rocket.vy = 0;
+    }
+  };
+
+  //Right
+  right.press = () => {
+    rocket.vx = 5;
+    rocket.vy = 0;
+  };
+  right.release = () => {
+    if (!left.isDown && rocket.vy === 0) {
+      rocket.vx = 0;
+    }
+  };
+
+  //Down
+  down.press = () => {
+    rocket.vy = 5;
+    rocket.vx = 0;
+  };
+  down.release = () => {
+    if (!up.isDown && rocket.vx === 0) {
+      rocket.vy = 0;
+    }
+  };
+
+  state = play;
+  app.renderer.render(app.stage);
+  app.ticker.add(delta => gameLoop(delta));
 }
-/* 
+
+function keyboard(value) {
+  const key = {
+    value,
+    isDown: false,
+    isUp: true,
+    press: undefined,
+    release: undefined,
+    downHandler: (e) => {
+      if (e.key === key.value) {
+        if (key.isUp && key.press) key.press();
+        key.isDown = true;
+        key.isUp = false;
+        e.preventDefault();
+      }
+    },
+    upHandler: (e) => {
+      if (e.key === key.value) {
+        if (key.isDown && key.release) key.release();
+        key.isDown = false;
+        key.isUp = true;
+        e.preventDefault();
+      }
+    },
+    unsubscribe: () => {
+      window.removeEventListener("keydown", key.downHandler);
+      window.removeEventListener("keyup", key.upHandler);
+    }
+  };
+
+  window.addEventListener(
+    "keydown", key.downHandler, false
+  );
+  window.addEventListener(
+    "keyup", key.upHandler, false
+  );
+  return key;
+}
+function gameLoop(delta) {
+  state(delta);
+}
+function play(delta) {
+  rocket.x += rocket.vx;
+  rocket.y += rocket.vy
+}
+// function moveRight(delta, item) {
+//   item.x += 1 + delta;
+// }
+// function moveLeft(delta, item) {
+//   item.x -= 1 + delta;
+// }
+// function moveUp(delta, item) {
+//   item.y += 1 + delta;
+// }
+// function moveDown(delta, item) {
+//   item.y -= 1 + delta;
+// }
+/*
 const shapes = [];
 let gravity = 1;
 const root = document.getElementById('root');
@@ -106,7 +220,7 @@ function generateRect(x = 50, y = -50) {
   //   Math.floor(Math.random() * 100)
   // );
   console.log('rect', rect);
-  
+
   rect.interactive = true;
   rect.buttonMode = true;
   rect.endFill();
